@@ -10,21 +10,21 @@ import org.springframework.stereotype.Repository;
 import com.carrerconnect.job_service.model.Job;
 
 @Repository
-public interface JobRepo extends JpaRepository<Job, Integer>{
+public interface JobRepo extends JpaRepository<Job, Integer> {
 
-//	List<Job> findAllById(int empId);
+    // List<Job> findAllById(int empId);
 
     // Search by skill, company, and location (Optional Filters)
-    @Query("SELECT j FROM Job j WHERE "
-            + "(:skill IS NULL OR LOWER(j.skillsRequired) LIKE LOWER(CONCAT('%', :skill, '%'))) AND "
-            + "(:company IS NULL OR LOWER(j.company) LIKE LOWER(CONCAT('%', :company, '%'))) AND "
-            + "(:location IS NULL OR LOWER(j.location) LIKE LOWER(CONCAT('%', :location, '%')))")
-	List<Job> searchJobs(@Param("skill") String skills, 
-			@Param("company")String company,
-			@Param("location")String location);
+    @Query(value = "SELECT * FROM job j WHERE "
+            + "(:skill IS NULL OR j.skills_required ILIKE CONCAT('%', :skill, '%')) AND "
+            + "(:company IS NULL OR j.company ILIKE CONCAT('%', :company, '%')) AND "
+            + "(:location IS NULL OR j.location ILIKE CONCAT('%', :location, '%'))", nativeQuery = true)
+    List<Job> searchJobs(@Param("skill") String skills,
+            @Param("company") String company,
+            @Param("location") String location);
 
-	boolean existsByEmployerId(int employerId);
+    boolean existsByEmployerId(int employerId);
 
-	List<Job> findAllByEmployerId(int employerId);
+    List<Job> findAllByEmployerId(int employerId);
 
 }
