@@ -25,12 +25,12 @@ public class Application {
 	int applicationId; 
     private String applicantName;
     private String applicantEmail;
-//    private String resumeUrl; // Optional: If applicants upload resumes
+
 
     @ManyToOne
     @JoinColumn(name = "job_id", nullable = false)
     private Job job;
     
-    private String Status ="pending";
+    private String status ="pending";
 
 }
