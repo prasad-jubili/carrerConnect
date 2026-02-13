@@ -2,7 +2,8 @@ package com.carrerconnect.job_service.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.carrerconnect.job_service.service.JobService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,120 +14,113 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.carrerconnect.job_service.DTO.JobApplicationDTO;
-import com.carrerconnect.job_service.DTO.JobDTO;
-import com.carrerconnect.job_service.model.Application;
-import com.carrerconnect.job_service.model.Job;
-import com.carrerconnect.job_service.service.JobService;
+import com.carrerconnect.job_service.dto.JobApplicationDTO;
+import com.carrerconnect.job_service.dto.JobDTO;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-@Slf4j
 @RestController
 @RequestMapping("/job")
 public class JobController {
 	
-	@Autowired
-	JobService jobService;
+//	@Autowired
+//	JobServiceImpl jobServiceImpl;
+
+	private final JobService jobService;
+
+	public JobController(JobService jobService){
+
+        this.jobService = jobService;
+    }
+
+	private static final Logger log = LoggerFactory.getLogger(JobController.class);
 	
 	@PostMapping("/jobPost")
-	public ResponseEntity<String> postJob(@RequestBody JobDTO jobDTO){
-		log.info("Inside the postJob in JobController");
-		log.info("posting the job");
-		return ResponseEntity.ok(jobService.postJob(jobDTO));
+	public ResponseEntity<String> postJob(
+			@Valid @RequestBody JobDTO jobDTO){
+
+		log.info("Request received to post job with title: {}", jobDTO.getJobTitle());
+
+		String response = jobService.postJob(jobDTO);
+
+		log.info("Job posted successfully");
+		return ResponseEntity.ok(response);
 	}
 	
 	@PutMapping("/editJob/{jobId}")
-	public ResponseEntity<Job> editJob(@PathVariable("jobId") int jobId, @RequestBody Job job){
-		log.info("Inside the editJob in JobController");
-		log.info("editing the posted job");
-		return ResponseEntity.ok(jobService.editJob(jobId,job));
+	public ResponseEntity<JobDTO> editJob(@PathVariable int jobId,
+										  @Valid @RequestBody JobDTO jobDto){
+		log.info("Request received to edit job with jobId : {}", jobId);
+		JobDTO dto = jobService.editJob(jobId,jobDto);
+		log.info("Job post updated successfully");
+		return ResponseEntity.ok(dto);
 	}
 	
 	@DeleteMapping("/deleteJob/{jobId}")
-	public ResponseEntity<String> deleteJob(@PathVariable("jobId") int jobId){
-		log.info("Inside the deleteJob in JobController");
-		log.info("deleting the posted job");
-		return ResponseEntity.ok(jobService.deleteJob(jobId));
+	public ResponseEntity<String> deleteJob(@PathVariable int jobId){
+		log.warn("Deleting job with jobId : {}", jobId);
+		String response = jobService.deleteJob(jobId);
+		log.info("Job Post deleted successfully");
+		return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping("/allJobsByEmp/{empId}")
-	public ResponseEntity<List<Job>> viewAllJobsByEmp(@PathVariable("empId") int empId){
-		log.info("Inside the viewAllJobsByEmp in JobController");
-		log.info("viewing all the jobs posted by specific employee");
-		return ResponseEntity.ok(jobService.viewAllJobsByEmp(empId));
+	public ResponseEntity<List<JobDTO>> viewAllJobsByEmp(@PathVariable int empId){
+		log.debug("Fetching jobs with emp Id: {}",
+				empId);
+
+		List<JobDTO> dtos = jobService.viewAllJobsByEmp(empId);
+		log.info("Job fetched successfully for emp Id: {}", empId);
+		return ResponseEntity.ok(dtos);
 	}
 	
 	@GetMapping("/allJobs")
-	public ResponseEntity<List<Job>> viewAllJobs(){
-		log.info("Inside the viewAllJobs in JobController");
-		log.info("viewing all the posted job");
-		return ResponseEntity.ok(jobService.viewAllJobs());
+	public ResponseEntity<List<JobDTO>> viewAllJobs(){
+		log.debug("Fetching all the jobs posted");
+
+		List<JobDTO> dtos = jobService.viewAllJobs();
+		log.info("Jobs fetched successfully");
+		return ResponseEntity.ok(dtos);
 	}
 	
 	@GetMapping("/Job/{jobId}")
-	public ResponseEntity<JobDTO> viewJob(@PathVariable("jobId") int jobId){
-		log.info("Inside the viewJob method in JobController");
-		log.info("viewing the job posted by jobID");
-		Job job = jobService.viewJob(jobId);
-		JobDTO jobdto = new JobDTO(
-				job.getEmployerId(),
-				job.getJobTitle(),
-				job.getLocation(),
-				job.getDescription(),
-				job.getExperience(),
-				job.getSalary(),
-				job.getNoticePeriod(),
-				job.getSkillsRequired(),
-				job.getCompany(),
-				job.getContactEmail(),
-				job.getStatus());
-		
+	public ResponseEntity<JobDTO> viewJob(@PathVariable int jobId){
+		log.debug("Fetching Job with Id: {}",jobId);
+		JobDTO jobdto = jobService.viewJob(jobId);
+		log.info("Job fetched successfully for Id: {}", jobId);
 		return ResponseEntity.ok(jobdto);
 	}
 
 	@PostMapping("/{jobId}/apply")
 	public ResponseEntity<String> applyJob
-	(@PathVariable("jobId") int jobId,@RequestBody JobApplicationDTO applicationDTO) {
-		log.info("Inside the applyJob method in JobController");
-		log.info("applying the posted job");
-		return ResponseEntity.ok(jobService.applyJob(jobId,applicationDTO));
+	(@PathVariable int jobId,
+	 @Valid @RequestBody JobApplicationDTO applicationDTO) {
+		log.info("Applying for a Job with jobId: {}",jobId);
+		String response = jobService.applyJob(jobId, applicationDTO);
+		log.info("Applied for posted job");
+		return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping("/search")
 	public ResponseEntity<List<JobDTO>> searchJobs(@RequestParam(required=false) String skills,
 			@RequestParam(required = false) String company,
 			@RequestParam(required = false) String location) {
-		log.info("Inside the searchJob in JobController");
-		log.info("searching the posted job based on skills, company, location");
-		 List<JobDTO> jobDTOs = jobService.searchJobs(skills, company, location)
-		            .stream()
-		            .map(job -> new JobDTO(
-		                    job.getEmployerId(),
-		                    job.getJobTitle(),
-		                    job.getLocation(),
-		                    job.getDescription(),
-		                    job.getExperience(),
-		                    job.getSalary(),
-		                    job.getNoticePeriod(),
-		                    job.getSkillsRequired(),
-		    				job.getCompany(),
-		                    job.getContactEmail(),
-		                    job.getStatus()
-		            ))
-		            .toList();
+		log.debug("Fetching jobs for given params");
+		List<JobDTO> jobDTOs = jobService.searchJobs(skills, company, location);
+		log.info("Successfully fetched the posted job based on skills, company, location");
 
-		    return ResponseEntity.ok(jobDTOs);
-//		return ResponseEntity.ok(jobs);
+		return ResponseEntity.ok(jobDTOs);
 	}
 	
 	@PutMapping("/updateStatus/{applicationId}")
-	public ResponseEntity<Application> updateStatus(@PathVariable("applicationId") int applicationId,@RequestParam("status") String status){
-		log.info("Inside the updateStatus in JobController");
-		log.info("updating status of a application of the posted job");
-		return ResponseEntity.ok(jobService.updateStatus(applicationId,status));
+	public ResponseEntity<JobApplicationDTO> updateStatus(@PathVariable int applicationId, @RequestParam("status") String status){
+		log.info("Updating status for application id: {}",applicationId);
+		JobApplicationDTO jobApplicationDTO = jobService.updateStatus(applicationId, status);
+		log.info("updated status successfully for application id: {}" , applicationId);
+		return ResponseEntity.ok(jobApplicationDTO);
 	}
 	
 }
