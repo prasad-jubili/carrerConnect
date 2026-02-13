@@ -1,111 +1,31 @@
 package com.carrerconnect.job_service.service;
 
-import java.util.Collections;
+import com.carrerconnect.job_service.dto.JobApplicationDTO;
+import com.carrerconnect.job_service.dto.JobDTO;
+
 import java.util.List;
 
+public interface JobService {
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+    String postJob(JobDTO jobDTO);
 
-import com.carrerconnect.job_service.DTO.JobApplicationDTO;
-import com.carrerconnect.job_service.DTO.JobDTO;
-import com.carrerconnect.job_service.model.Application;
-import com.carrerconnect.job_service.model.Job;
-import com.carrerconnect.job_service.repo.ApplicationRepo;
-import com.carrerconnect.job_service.repo.JobRepo;
+    JobDTO editJob(int jobId, JobDTO updatedJob);
 
-@Service
-public class JobService {
-	
-	@Autowired
-	JobRepo jobRepo;
-	
-	@Autowired
-	ApplicationRepo applicationRepo;
+    String deleteJob(int jobId);
 
-	public String postJob(JobDTO jobDTO) {
-		Job job = new Job();
-	    job.setJobTitle(jobDTO.getJobTitle());
-	    job.setLocation(jobDTO.getLocation());
-	    job.setDescription(jobDTO.getDescription());
-	    job.setExperience(jobDTO.getExperience());
-	    job.setSalary(jobDTO.getSalary());
-	    job.setNoticePeriod(jobDTO.getNoticePeriod());
-	    job.setContactEmail(jobDTO.getContactEmail());
-	    job.setStatus(jobDTO.getStatus());
-	    job.setApplications(Collections.emptyList());
-	    jobRepo.save(job);
-		return "Job is posted";
-	}
+    List<JobDTO> viewAllJobsByEmp(int empId);
 
-	public Job editJob(int jobId, Job updatedJob) {
-		return jobRepo.findById(jobId)
-		.map(existingJob -> {
-			existingJob.setJobTitle(updatedJob.getJobTitle());
-			existingJob.setContactEmail(updatedJob.getContactEmail());
-			existingJob.setDescription(updatedJob.getDescription());
-			existingJob.setExperience(updatedJob.getExperience());
-			existingJob.setLocation(updatedJob.getLocation());
-			existingJob.setNoticePeriod(updatedJob.getNoticePeriod());
-			existingJob.setSalary(updatedJob.getSalary());
-			existingJob.setStatus(updatedJob.getStatus());
-			return jobRepo.save(existingJob);
-			})
-		.orElseThrow(() -> new RuntimeException("No job posting is found with given JobId"));
-		
-	}
+    List<JobDTO> viewAllJobs();
 
-	public String deleteJob(int jobId) {
-	    if (!jobRepo.existsById(jobId)) {
-	        throw new RuntimeException("No job is found with the given JobId");
-	    }
+    String applyJob(int jobId, JobApplicationDTO applicationDTO);
 
-	    jobRepo.deleteById(jobId);
-	    return "Job deleted successfully";
-	}
+    List<JobDTO> searchJobs(String skill, String company, String location);
 
-	public List<Job> viewAllJobsByEmp(int empId) {
-		if(!jobRepo.existsByEmployerId(empId)) {
-			throw new RuntimeException("No employee found with given Id");		}
-		
-		return jobRepo.findAllByEmployerId(empId);	}
-	
-	public List<Job> viewAllJobs() {
-		
-		return jobRepo.findAll();	}
+    JobApplicationDTO updateStatus(int applicationId, String status);
 
-	public String applyJob(int jobId, JobApplicationDTO applicationDTO) {
-		Job job = jobRepo.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("No job found for jobId : " +jobId));
-		
-		Application application = new Application();
-		application.setApplicantEmail(applicationDTO.getApplicantEmail());
-		application.setApplicantName(applicationDTO.getApplicantName());
-		application.setJob(job);
-		applicationRepo.save(application);
-		return "Application submitted successfully";
-	}
+    JobDTO viewJob(int jobId);
 
-	public List<Job> searchJobs(String skills, String company, String location) {
-		return jobRepo.searchJobs(skills,company,location);
-	}
 
-	public Application updateStatus(int applicationId, String status) {
-		if(!status.equalsIgnoreCase("rejected")&& !status.equalsIgnoreCase("approved")) {
-			throw new IllegalArgumentException("Incorrect Status provided. Allowed: Rejected, Approved");
-		}
-		Application application = applicationRepo.findById(applicationId)
-				.orElseThrow(()-> new RuntimeException("No applicent found with applicationId : "+applicationId));
-		application.setStatus(status);
-//		applicationRepo.save(application);
-		return applicationRepo.save(application);
-	}
-
-	public Job viewJob(int jobId) {
-		Job job = jobRepo.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("No job found with jobId : "+jobId));
-		return job;
-	}
 
 
 }
