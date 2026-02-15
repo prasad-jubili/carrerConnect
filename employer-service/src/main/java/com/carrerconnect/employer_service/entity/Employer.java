@@ -29,13 +29,9 @@ public class Employer {
 	private String address;
 
 	@Column(unique = true, nullable = false)
-	@NotBlank(message = "Contact number is required")
-	@Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid contact number format")
 	private String contactNumber;
 
 	@Column(unique = true, nullable = false)
-	@NotBlank(message = "Email is required")
-	@Email(message = "Invalid email format")
 	private String email;
 
 }
