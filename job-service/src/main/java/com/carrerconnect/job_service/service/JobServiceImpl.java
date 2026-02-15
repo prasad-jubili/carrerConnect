@@ -3,6 +3,7 @@ package com.carrerconnect.job_service.service;
 import java.util.List;
 
 
+import com.carrerconnect.job_service.client.EmployerClient;
 import com.carrerconnect.job_service.exception.ResourceNotFoundException;
 import com.carrerconnect.job_service.mapper.JobMapper;
 import com.carrerconnect.job_service.entity.Application;
@@ -31,25 +32,39 @@ public class JobServiceImpl implements JobService {
 	private final JobRepo jobRepo;
 	private final ApplicationRepo applicationRepo;
 	private final JobMapper jobMapper;
+	private final EmployerClient employerClient;
+
 
 	public JobServiceImpl(JobRepo jobRepo,
 						  ApplicationRepo applicationRepo,
-						  JobMapper jobMapper) {
+						  JobMapper jobMapper,
+						  EmployerClient employerClient) {
 		this.jobRepo = jobRepo;
 		this.applicationRepo = applicationRepo;
 		this.jobMapper = jobMapper;
+		this.employerClient = employerClient;
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(JobServiceImpl.class);
 
 
 	public String postJob(JobDTO jobDTO) {
-		log.info("Saving job with Id : {}",jobDTO.getJobId());
+
+		// Validate employer existence
+		try {
+			employerClient.getEmployerById(jobDTO.getEmployerId());
+		} catch (Exception ex) {
+			throw new ResourceNotFoundException(
+					"Employer not found with id: " + jobDTO.getEmployerId()
+			);
+		}
+
 		Job job = jobMapper.toEntity(jobDTO);
 		jobRepo.save(job);
-		log.info("job saved successfully with Id: {}" , job.getJobId());
+
 		return "Job is posted";
 	}
+
 
 	@Override
 	public JobDTO editJob(int jobId, JobDTO updatedJob) {

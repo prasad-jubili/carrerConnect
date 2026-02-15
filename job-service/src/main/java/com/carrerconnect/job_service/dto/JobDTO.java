@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 public class JobDTO {
     private int jobId;
 
+        @NotBlank(message = "Employer Id is required")
+        private int employerId;
+
         @NotBlank(message = "Job title is required")
         private String jobTitle;
 

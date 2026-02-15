@@ -14,6 +14,7 @@ public class JobMapper {
     public Job toEntity(JobDTO dto){
         Job job = new Job();
         job.setJobTitle(dto.getJobTitle());
+        job.setEmployerId(dto.getEmployerId());
         job.setLocation(dto.getLocation());
         job.setDescription(dto.getDescription());
         job.setExperience(dto.getExperience());
@@ -28,6 +29,7 @@ public class JobMapper {
     public JobDTO toDTO(Job job){
         JobDTO  dto = new JobDTO();
         dto.setJobId(job.getJobId());
+        dto.setEmployerId(job.getEmployerId());
         dto.setJobTitle(job.getJobTitle());
         dto.setLocation(job.getLocation());
         dto.setDescription(job.getDescription());
@@ -56,6 +58,7 @@ public class JobMapper {
 
     public void updateEntity(Job job, JobDTO dto) {
         job.setJobTitle(dto.getJobTitle());
+        job.setEmployerId(dto.getEmployerId());
         job.setLocation(dto.getLocation());
         job.setDescription(dto.getDescription());
         job.setExperience(dto.getExperience());
