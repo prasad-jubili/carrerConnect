@@ -5,13 +5,14 @@ import java.util.List;
 
 import com.carrerconnect.job_service.exception.ResourceNotFoundException;
 import com.carrerconnect.job_service.mapper.JobMapper;
-import com.carrerconnect.job_service.model.Application;
-import com.carrerconnect.job_service.model.Job;
+import com.carrerconnect.job_service.entity.Application;
+import com.carrerconnect.job_service.entity.Job;
 import com.carrerconnect.job_service.repo.ApplicationRepo;
 import com.carrerconnect.job_service.repo.JobRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.carrerconnect.job_service.dto.JobApplicationDTO;
@@ -100,10 +101,10 @@ public class JobServiceImpl implements JobService {
 
 
 	@Override
-	public List<JobDTO> viewAllJobs() {
-		List<Job> job = jobRepo.findAll();
-		List<JobDTO> dto = job.stream().map(jobMapper::toDTO).toList();
-		return dto;	}
+	public Page<JobDTO> viewAllJobs(Pageable pageable) {
+		Page<Job> jobPage = jobRepo.findAll(pageable);
+		return jobPage.map(jobMapper::toDTO);
+	}
 
 	@Override
 	public String applyJob(int jobId, JobApplicationDTO applicationDTO) {
@@ -115,13 +116,9 @@ public class JobServiceImpl implements JobService {
 	}
 
 	@Override
-	public List<JobDTO> searchJobs(String skills, String company, String location) {
-		List<Job> jobs= jobRepo.searchJobs(
-				skills == null ? "" : skills,
-				company == null ? "" : company,
-				location == null ? "" : location);
-		List<JobDTO> dtos = jobs.stream().map(jobMapper::toDTO).toList();
-		return dtos;
+	public Page<JobDTO> searchJobs(String skills, String company, String location, Pageable pageable) {
+		Page<Job> jobs= jobRepo.searchJobs(skills, company, location, pageable);
+		 return jobs.map(jobMapper::toDTO);
 	}
 
 	@Override

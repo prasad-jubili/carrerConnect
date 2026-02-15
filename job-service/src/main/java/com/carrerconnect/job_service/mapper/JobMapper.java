@@ -2,8 +2,8 @@ package com.carrerconnect.job_service.mapper;
 
 import com.carrerconnect.job_service.dto.JobApplicationDTO;
 import com.carrerconnect.job_service.dto.JobDTO;
-import com.carrerconnect.job_service.model.Application;
-import com.carrerconnect.job_service.model.Job;
+import com.carrerconnect.job_service.entity.Application;
+import com.carrerconnect.job_service.entity.Job;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;

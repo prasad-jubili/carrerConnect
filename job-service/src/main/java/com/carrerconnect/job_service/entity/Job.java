@@ -1,4 +1,4 @@
-package com.carrerconnect.job_service.model;
+package com.carrerconnect.job_service.entity;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class Job {
 	private String location;
 	private String description;
 	private int experience;
-	private int salary;
+	private double salary;
 	private int noticePeriod;
 	private String skillsRequired;
 	private String company;
