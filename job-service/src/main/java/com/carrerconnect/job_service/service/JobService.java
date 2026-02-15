@@ -2,6 +2,8 @@ package com.carrerconnect.job_service.service;
 
 import com.carrerconnect.job_service.dto.JobApplicationDTO;
 import com.carrerconnect.job_service.dto.JobDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -15,11 +17,11 @@ public interface JobService {
 
     List<JobDTO> viewAllJobsByEmp(int empId);
 
-    List<JobDTO> viewAllJobs();
+    Page<JobDTO> viewAllJobs(Pageable pageable);
 
     String applyJob(int jobId, JobApplicationDTO applicationDTO);
 
-    List<JobDTO> searchJobs(String skill, String company, String location);
+    Page<JobDTO> searchJobs(String skill, String company, String location, Pageable pageable);
 
     JobApplicationDTO updateStatus(int applicationId, String status);
 

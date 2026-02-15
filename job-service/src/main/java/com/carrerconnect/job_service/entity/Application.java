@@ -1,4 +1,4 @@
-package com.carrerconnect.job_service.model;
+package com.carrerconnect.job_service.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

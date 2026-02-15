@@ -29,7 +29,7 @@ public class JobDTO {
         private double salary;
 
         @NotBlank(message = "Notice period is required")
-        private String noticePeriod;
+        private int noticePeriod;
 
         @Email(message = "Invalid email format")
         @NotBlank(message = "Contact email is required")
